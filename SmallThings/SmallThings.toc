@@ -1,0 +1,19 @@
+## Interface: 30300
+## Title: SmallThings
+## Notes: Small tickable QoL options for the Uncapped server.
+## Author: Michael
+## Version: 1.5.1
+## SavedVariables: SmallThingsDB
+
+Core.lua
+InstantDestroy.lua
+TooltipIDs.lua
+ItemMenu.lua
+VendorSell.lua
+CameraZoom.lua
+ErrorFilter.lua
+Crisp.lua
+ClassColors.lua
+MinimapButton.lua
+Timestamps.lua
+AutoReset.lua
