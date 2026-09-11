@@ -4,7 +4,7 @@
 
 local ADDON, ns = ...
 
-ns.version = "1.5.1"
+ns.version = "1.6.0"
 
 local defaults = {
     instantDestroy = false, -- dangerous, ships OFF
@@ -19,6 +19,7 @@ local defaults = {
     minimapButton  = true,  -- the cog on the minimap rim
     chatTimestamps = true,  -- grey hh:mm on every chat line
     autoReset      = false, -- sends a server command, ships OFF
+    autoResetMythic = false, -- sends .mythic reset on exit, ships OFF
     minimapPos     = 220,   -- saved drag angle (degrees), not a checkbox
 }
 
@@ -93,9 +94,13 @@ local function BuildPanel()
     Check("chatTimestamps", "Chat timestamps",
           "Grey hh:mm before every line in the chat windows (combat log "
           .. "excluded). Applies to new messages instantly.")
-    Check("autoReset", "Auto-reset dungeons",
+    Check("autoReset", "Auto-reset (dungeons & raids)",
           "Send the server's .reset command automatically when you leave a "
-          .. "dungeon. The server's own reply confirms or refuses it.")
+          .. "dungeon or raid. The server's own reply confirms or refuses it.")
+    Check("autoResetMythic", "Auto-reset mythic",
+          "Also send the server's .mythic reset command when you leave an "
+          .. "instance. The server refuses it if the run wasn't mythic. "
+          .. "Works with or without the tick above.")
 
     InterfaceOptions_AddCategory(p)
     ns.panel = p
