@@ -1,9 +1,9 @@
 --[[ SmallThings — Imprint glows
      Colored rings on the character panel's equipped slots: PURPLE when the
      piece carries an IMPRINTED proc (a proc beyond the item's own native
-     ones), RED when it carries no imprint yet. Shirt and tabard excluded
-     (never imprint targets); empty slots and pre-data states show nothing,
-     so a fresh login never shows false reds.
+     ones), RED when it carries no imprint yet. All 19 worn slots covered
+     (on Uncapped even shirt and tabard take imprints); empty slots and
+     pre-data states show nothing, so a fresh login never shows false reds.
 
      Fully self-contained: listens to the server's own proc streams (the
      ICINV inventory sweep for what each worn piece carries, the ICEXI
@@ -33,14 +33,17 @@ local function request()
 end
 
 -- ---- glow painting ----------------------------------------------------------
-local GLOW_SLOTS = {  -- invSlot -> paperdoll button; shirt(4)/tabard(19) excluded
+local GLOW_SLOTS = {  -- invSlot -> paperdoll button (all 19 worn slots; on
+    -- Uncapped even shirt and tabard are valid imprint targets)
     [1] = "CharacterHeadSlot", [2] = "CharacterNeckSlot", [3] = "CharacterShoulderSlot",
+    [4] = "CharacterShirtSlot",
     [5] = "CharacterChestSlot", [6] = "CharacterWaistSlot", [7] = "CharacterLegsSlot",
     [8] = "CharacterFeetSlot", [9] = "CharacterWristSlot", [10] = "CharacterHandsSlot",
     [11] = "CharacterFinger0Slot", [12] = "CharacterFinger1Slot",
     [13] = "CharacterTrinket0Slot", [14] = "CharacterTrinket1Slot",
     [15] = "CharacterBackSlot", [16] = "CharacterMainHandSlot",
     [17] = "CharacterSecondaryHandSlot", [18] = "CharacterRangedSlot",
+    [19] = "CharacterTabardSlot",
 }
 local glowTex = {}
 
