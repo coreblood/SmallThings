@@ -1,0 +1,92 @@
+SmallThings — Changelog
+by Mhortai — Uncapped server (WoW 3.3.5a)
+
+v1.7.0 (2026-09-12)
+- Options panel visual rework — same thirteen options, no behavior change:
+  - Grouped under gold section headers with divider lines: Items & Vendor,
+    Chat, Tooltips (left) / UI & Graphics, Dungeons (right).
+  - Two columns — everything fits on screen, no more clipping at the
+    bottom of the list.
+  - Auto-sell whites is indented under Auto-sell greys, and Auto-reset
+    mythic under Auto-reset, showing they belong together.
+  - Auto-sell whites label tinted red — a risky option now looks risky.
+  - Tighter row spacing inside a group, wider gap between groups.
+  - "by Mhortai" footer, bottom-right.
+
+v1.6.0 (2026-09-11)
+- Auto-reset widened to raids: the tick is now "Auto-reset (dungeons &
+  raids)" — one checkbox, .reset sent once on any instance-to-world exit,
+  dungeon or raid. Same 1.5 s delay and once-per-exit guard; existing
+  saved setting carries over.
+- Auto-reset mythic (default OFF): a second tick that also sends the
+  server's .mythic reset command on instance exit, staggered 0.3 s after
+  .reset. The server refuses whichever command doesn't apply to the run.
+  The two ticks are independent — mythic alone still fires on exit.
+
+v1.5.1 (2026-09-10)
+- Fix: the auto-reset .reset command was sent the instant the outside world
+  loaded, on the loading-screen edge where the server can silently drop
+  chat. Now sent 1.5 seconds after landing.
+
+v1.5.0 (2026-09-10)
+- Auto-reset dungeons (default OFF): sends the server's .reset command once
+  when leaving a dungeon; party-instance exits only — never at login, never
+  between instances, never on raid exits. Server reply confirms or refuses.
+- Docs repackaged to the standard deliverable set: the zip now contains only
+  the addon; the Guide PDF (changelog included), the nutshell PDF and this
+  changelog ship alongside it.
+
+v1.4.1 (2026-09-10)
+- Fix: chat timestamps showed in the server's Uncapped Chat but not in the
+  default chat — the showTimestamps CVar used in v1.4.0 is a Cataclysm
+  feature that does not exist on 3.3.5a. Reworked to Wrath-correct
+  per-frame AddMessage prefixing; combat log excluded.
+
+v1.4.0 (2026-09-10)
+- Chat timestamps (default ON): grey hh:mm prefix on chat lines in the
+  default chat windows.
+
+v1.3.1 (2026-09-10)
+- Fix: Crisp graphics errored at login — horizonfarclip does not exist on
+  the 3.3.5a client and the error aborted the preset mid-loop, leaving
+  later CVars unapplied. Removed from the preset; all CVar access is now
+  guarded so an unknown name can never break the preset again.
+
+v1.3.0 (2026-09-09)
+- Minimap button (default ON): a cog on the minimap rim — click opens the
+  options panel, drag repositions it around the rim (angle saved).
+  Zero-dependency construction, hideable via its own tick.
+
+v1.2.0 (2026-09-09)
+- Crisp graphics (default OFF): CVar preset beyond the video sliders —
+  farclip 1277, ground clutter 256/140, full doodads, clouds 3, weather 3,
+  8x MSAA (applies at next login). Saves the user's previous values on tick
+  and restores them on untick. FPS cost documented.
+- Class-colored chat names (default ON): the client's native
+  color-names-by-class flag for all chat types and channels 1-10; saves and
+  restores previous per-type flags. No message hooks.
+
+v1.1.0 (2026-09-09)
+- Auto-sell greys (default ON): sells all greys on vendor open; one pooled
+  chat summary per visit, only when something sold.
+- Auto-sell whites (default OFF): sells every white item with a sell price —
+  gear, consumables, trade goods, recipes. Price-zero items (quest items,
+  hearthstone) skipped by construction. 12-slot buyback limit warned.
+- Max camera zoom (default ON): camera cap 50 while ticked, 15 restored on
+  untick; re-applied at login.
+- UI error spam filter (default ON): mutes out-of-resource and cooldown
+  center-screen messages, exact-matched against the client's own ERR_*
+  strings; all other errors pass through unchanged.
+
+v1.0.0 (2026-09-08)
+- Initial release: options panel under Interface > AddOns, /smallthings
+  command, per-account settings.
+- Instant destroy (default OFF): auto-confirms all four delete dialogs,
+  matched strictly by name; graceful fallback to the normal dialog.
+- Show IDs in tooltips (default ON): item / enchant / spell / aura / talent
+  IDs. Absorbed from IDTip v1.0.0, which is retired — remove its folder.
+- Alt+Right-click bag-item menu (default ON): Equip / Stash to Vault /
+  Split. Stash uses the server's VLTDEP verb; eligibility and error
+  messages are server-side. All actions on the clicked bag/slot directly.
+- Planned but dropped: instant logout — the 20 s countdown is
+  server-enforced; handled server-side instead.

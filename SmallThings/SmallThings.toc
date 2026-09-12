@@ -2,7 +2,7 @@
 ## Title: SmallThings
 ## Notes: Small tickable QoL options for the Uncapped server.
 ## Author: Michael
-## Version: 1.7.0
+## Version: 1.8.0
 ## SavedVariables: SmallThingsDB
 
 Core.lua
@@ -17,3 +17,4 @@ ClassColors.lua
 MinimapButton.lua
 Timestamps.lua
 AutoReset.lua
+ImprintGlow.lua

@@ -4,7 +4,7 @@
 
 local ADDON, ns = ...
 
-ns.version = "1.7.0"
+ns.version = "1.8.0"
 
 local defaults = {
     instantDestroy = false, -- dangerous, ships OFF
@@ -20,6 +20,7 @@ local defaults = {
     chatTimestamps = true,  -- grey hh:mm on every chat line
     autoReset      = false, -- sends a server command, ships OFF
     autoResetMythic = false, -- sends .mythic reset on exit, ships OFF
+    imprintGlow    = true,  -- paperdoll rings: purple = imprinted, red = not
     minimapPos     = 220,   -- saved drag angle (degrees), not a checkbox
 }
 
@@ -136,6 +137,15 @@ local function BuildPanel()
           "Also send the server's .mythic reset command when you leave an "
           .. "instance. The server refuses it if the run wasn't mythic. "
           .. "Works with or without the tick above.")
+
+    y[2] = y[2] - GAP
+    Header(2, "Character")
+    Check(2, 0, "imprintGlow", "Imprint glows",
+          "Colored rings on your equipped gear in the character panel: "
+          .. "purple = the piece carries an imprinted proc, red = no imprint "
+          .. "yet. Nothing glows until proc data has arrived.", nil, function()
+              if ns.PaintImprintGlows then ns.PaintImprintGlows() end
+          end)
 
     local foot = p:CreateFontString(nil, "ARTWORK", "GameFontDisableSmall")
     foot:SetPoint("BOTTOMRIGHT", -16, 16)
