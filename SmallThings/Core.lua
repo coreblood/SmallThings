@@ -4,7 +4,7 @@
 
 local ADDON, ns = ...
 
-ns.version = "1.9.2"
+ns.version = "1.9.3"
 
 local defaults = {
     instantDestroy = false, -- dangerous, ships OFF
