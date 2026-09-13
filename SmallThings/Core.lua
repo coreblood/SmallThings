@@ -4,7 +4,7 @@
 
 local ADDON, ns = ...
 
-ns.version = "1.8.1"
+ns.version = "1.9.0"
 
 local defaults = {
     instantDestroy = false, -- dangerous, ships OFF
@@ -20,6 +20,7 @@ local defaults = {
     chatTimestamps = true,  -- grey hh:mm on every chat line
     autoReset      = false, -- sends a server command, ships OFF
     autoResetMythic = false, -- sends .mythic reset on exit, ships OFF
+    autoVoteDeeper = true,  -- auto-click "Vote to go deeper" gossip option
     imprintGlow    = true,  -- paperdoll rings: purple = imprinted, red = not
     minimapPos     = 220,   -- saved drag angle (degrees), not a checkbox
 }
@@ -137,6 +138,10 @@ local function BuildPanel()
           "Also send the server's .mythic reset command when you leave an "
           .. "instance. The server refuses it if the run wasn't mythic. "
           .. "Works with or without the tick above.")
+    Check(2, 0, "autoVoteDeeper", "Auto-vote deeper",
+          "When a dialog with a 'Vote to go deeper' option opens, vote it "
+          .. "instantly. While this is on you can never vote to stop - "
+          .. "untick to vote manually.")
 
     y[2] = y[2] - GAP
     Header(2, "Character")
