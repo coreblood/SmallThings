@@ -83,12 +83,14 @@ end)
 -- the log have no data source and are left alone.
 -- ---------------------------------------------------------------------------
 local questItems = {}   -- lower(item name) -> { quest, zone, prog }
+local logQuests = {}    -- { quest, zone, hay = lower(title + objective texts) }
 local qiDirty = true
 local qiScanning = false
 
 local function RebuildQuestItems()
     qiScanning = true
     wipe(questItems)
+    wipe(logQuests)
     -- collapsed headers hide their quests from the log API: expand, scan,
     -- then re-collapse exactly the headers that were collapsed (by name)
     local collapsed = {}
@@ -103,6 +105,7 @@ local function RebuildQuestItems()
         if isHeader then
             zone = title
         elseif title then
+            local hay = title:lower()
             for o = 1, GetNumQuestLeaderBoards(i) do
                 local text, otype = GetQuestLogLeaderBoard(o, i)
                 if otype == "item" and text then
@@ -112,7 +115,9 @@ local function RebuildQuestItems()
                             { quest = title, zone = zone, prog = prog }
                     end
                 end
+                if text then hay = hay .. "\n" .. text:lower() end
             end
+            logQuests[#logQuests + 1] = { quest = title, zone = zone, hay = hay }
         end
     end
     if next(collapsed) then
@@ -128,10 +133,26 @@ end
 
 local function OnQuestItem(tt)
     if not (ns.db and ns.db.questTooltip) or tt.SmallThingsQuest then return end
-    local name = tt:GetItem()
+    local name, link = tt:GetItem()
     if not name then return end
     if qiDirty then RebuildQuestItems() end
     local q = questItems[name:lower()]
+    if not q then
+        -- 2nd pass: delivery/find quests track no "item" objective, but the
+        -- bag item is flagged Quest Item and its name appears verbatim in the
+        -- quest's title or freeform objective text. Quest Items only, so
+        -- ordinary items can't false-match. No progress line (there is none).
+        local itemType = link and select(6, GetItemInfo(link))
+        if itemType == "Quest" then
+            local needle = name:lower()
+            for _, lq in ipairs(logQuests) do
+                if lq.hay:find(needle, 1, true) then
+                    q = { quest = lq.quest, zone = lq.zone }
+                    break
+                end
+            end
+        end
+    end
     if not q then return end
     tt.SmallThingsQuest = true
     tt:AddDoubleLine("Quest: " .. q.quest, q.prog or "", 1, 0.82, 0, 1, 1, 1)
