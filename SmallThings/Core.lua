@@ -4,11 +4,12 @@
 
 local ADDON, ns = ...
 
-ns.version = "1.9.3"
+ns.version = "1.10.0"
 
 local defaults = {
     instantDestroy = false, -- dangerous, ships OFF
     tooltipIDs     = true,  -- cosmetic, replaces standalone IDTip
+    questTooltip   = true,  -- quest name/area/progress on quest items
     itemMenu       = true,  -- Alt+Right-click menu on bag items
     sellGreys      = true,  -- pure junk, safe
     sellWhites     = false, -- aggressive: EVERYTHING white, ships OFF
@@ -105,6 +106,10 @@ local function BuildPanel()
     Header(1, "Tooltips")
     Check(1, 0, "tooltipIDs", "Show IDs in tooltips",
           "Item, enchant, spell, aura and talent IDs on tooltips.")
+    Check(1, 0, "questTooltip", "Quest info on quest items",
+          "Items matching a quest-log objective show the quest's name, "
+          .. "progress and area on their tooltip. Only quests currently "
+          .. "in your log.")
 
     -- ------------------------------------------------ right column
     Header(2, "UI & Graphics")

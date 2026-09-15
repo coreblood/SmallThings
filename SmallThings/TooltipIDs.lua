@@ -74,3 +74,78 @@ hooksecurefunc(GameTooltip, "SetTalent", function(tt, tab, index)
         AddID(tt, "Talent ID", string.match(link, "talent:(%d+)"))
     end
 end)
+
+-- ---------------------------------------------------------------------------
+-- Quest info on quest items: for any bag item that matches a CURRENT quest-
+-- log objective ("Boar Tusk: 4/10"), the tooltip gains the quest's name,
+-- progress, and the zone the quest log files it under. Log-based, so custom
+-- server quests work automatically; items for quests not (or no longer) in
+-- the log have no data source and are left alone.
+-- ---------------------------------------------------------------------------
+local questItems = {}   -- lower(item name) -> { quest, zone, prog }
+local qiDirty = true
+local qiScanning = false
+
+local function RebuildQuestItems()
+    qiScanning = true
+    wipe(questItems)
+    -- collapsed headers hide their quests from the log API: expand, scan,
+    -- then re-collapse exactly the headers that were collapsed (by name)
+    local collapsed = {}
+    for i = 1, GetNumQuestLogEntries() do
+        local title, _, _, _, isHeader, isCollapsed = GetQuestLogTitle(i)
+        if isHeader and isCollapsed then collapsed[title] = true end
+    end
+    if next(collapsed) then ExpandQuestHeader(0) end
+    local zone = UNKNOWN or "?"
+    for i = 1, GetNumQuestLogEntries() do
+        local title, _, _, _, isHeader = GetQuestLogTitle(i)
+        if isHeader then
+            zone = title
+        elseif title then
+            for o = 1, GetNumQuestLeaderBoards(i) do
+                local text, otype = GetQuestLogLeaderBoard(o, i)
+                if otype == "item" and text then
+                    local name, prog = text:match("^(.-):%s*(%d+%s*/%s*%d+)%s*$")
+                    if name then
+                        questItems[name:lower()] =
+                            { quest = title, zone = zone, prog = prog }
+                    end
+                end
+            end
+        end
+    end
+    if next(collapsed) then
+        -- indices shifted after the expand; walk headers and re-collapse by name
+        for i = GetNumQuestLogEntries(), 1, -1 do
+            local title, _, _, _, isHeader = GetQuestLogTitle(i)
+            if isHeader and collapsed[title] then CollapseQuestHeader(i) end
+        end
+    end
+    qiDirty = false
+    qiScanning = false
+end
+
+local function OnQuestItem(tt)
+    if not (ns.db and ns.db.questTooltip) or tt.SmallThingsQuest then return end
+    local name = tt:GetItem()
+    if not name then return end
+    if qiDirty then RebuildQuestItems() end
+    local q = questItems[name:lower()]
+    if not q then return end
+    tt.SmallThingsQuest = true
+    tt:AddDoubleLine("Quest: " .. q.quest, q.prog or "", 1, 0.82, 0, 1, 1, 1)
+    tt:AddLine("Area: " .. q.zone, 0.6, 0.6, 1)
+    tt:Show()
+end
+
+for _, tt in ipairs({ GameTooltip, ItemRefTooltip }) do
+    tt:HookScript("OnTooltipSetItem", OnQuestItem)
+    tt:HookScript("OnTooltipCleared", function(t) t.SmallThingsQuest = nil end)
+end
+
+local qiEv = CreateFrame("Frame")
+qiEv:RegisterEvent("QUEST_LOG_UPDATE")
+qiEv:SetScript("OnEvent", function()
+    if not qiScanning then qiDirty = true end
+end)
