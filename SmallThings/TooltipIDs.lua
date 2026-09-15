@@ -180,3 +180,31 @@ qiEv:RegisterEvent("QUEST_LOG_UPDATE")
 qiEv:SetScript("OnEvent", function()
     if not qiScanning then qiDirty = true end
 end)
+
+-- Debug probe: /run SmallThingsQuestDebug("Crate of Power Stones")
+-- Deliberately the LAST statement in this file: if calling it errors with
+-- "attempt to call ... nil", this file did not load to the end (old version
+-- on disk, or a load-time error above killed the quest hooks).
+function SmallThingsQuestDebug(name)
+    local p = print
+    p("ST " .. (GetAddOnMetadata("SmallThings", "Version") or "?")
+      .. " | tick: " .. tostring(ns.db and ns.db.questTooltip))
+    RebuildQuestItems()
+    local nExact = 0
+    for _ in pairs(questItems) do nExact = nExact + 1 end
+    p("quests scanned: " .. #logQuests .. " | exact-map entries: " .. nExact)
+    if not name then return end
+    local needle = Norm(name)
+    p("needle: [" .. needle .. "]  (" .. #needle .. " chars)")
+    local q = questItems[needle]
+    p("exact pass: " .. (q and (q.quest .. " " .. (q.prog or "")) or "no"))
+    local hit
+    for _, lq in ipairs(logQuests) do
+        if lq.hay:find(needle, 1, true) then hit = lq break end
+    end
+    p("text pass: " .. (hit and (hit.quest .. " (" .. hit.zone .. ")") or "NO MATCH"))
+    if not hit and not q then
+        p("-- haystacks (normalized) --")
+        for _, lq in ipairs(logQuests) do p(lq.quest .. ": " .. lq.hay) end
+    end
+end
