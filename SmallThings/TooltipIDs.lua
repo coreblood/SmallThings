@@ -82,9 +82,16 @@ end)
 -- server quests work automatically; items for quests not (or no longer) in
 -- the log have no data source and are left alone.
 -- ---------------------------------------------------------------------------
-local questItems = {}   -- lower(item name) -> { quest, zone, prog }
-local logQuests = {}    -- { quest, zone, hay = lower(title + objective texts) }
+local questItems = {}   -- Norm(item name) -> { quest, zone, prog }
+local logQuests = {}    -- { quest, zone, hay = Norm'd title + objective texts }
 local qiDirty = true
+
+-- The server's item/quest text disagrees on whitespace ("Crate of Power
+-- Stones" vs "Powerstones", trailing spaces in names), so both sides are
+-- normalized before any comparison: lowercase, letters and digits only.
+local function Norm(s)
+    return (s:lower():gsub("[^%w]", ""))
+end
 local qiScanning = false
 
 local function RebuildQuestItems()
@@ -105,17 +112,19 @@ local function RebuildQuestItems()
         if isHeader then
             zone = title
         elseif title then
-            local hay = title:lower()
+            -- pieces joined with "|" (never in a Norm'd needle), so a needle
+            -- can't accidentally match across two texts' boundary
+            local hay = Norm(title)
             for o = 1, GetNumQuestLeaderBoards(i) do
                 local text, otype = GetQuestLogLeaderBoard(o, i)
                 if otype == "item" and text then
                     local name, prog = text:match("^(.-):%s*(%d+%s*/%s*%d+)%s*$")
                     if name then
-                        questItems[name:lower()] =
+                        questItems[Norm(name)] =
                             { quest = title, zone = zone, prog = prog }
                     end
                 end
-                if text then hay = hay .. "\n" .. text:lower() end
+                if text then hay = hay .. "|" .. Norm(text) end
             end
             logQuests[#logQuests + 1] = { quest = title, zone = zone, hay = hay }
         end
@@ -136,15 +145,16 @@ local function OnQuestItem(tt)
     local name, link = tt:GetItem()
     if not name then return end
     if qiDirty then RebuildQuestItems() end
-    local q = questItems[name:lower()]
+    local q = questItems[Norm(name)]
     if not q then
         -- 2nd pass: delivery/find quests track no "item" objective, but the
-        -- bag item is flagged Quest Item and its name appears verbatim in the
-        -- quest's title or freeform objective text. Quest Items only, so
+        -- bag item is flagged Quest Item and its (normalized) name appears in
+        -- the quest's title or freeform objective text. Quest Items only, so
         -- ordinary items can't false-match. No progress line (there is none).
         local itemType = link and select(6, GetItemInfo(link))
         if itemType == "Quest" then
-            local needle = name:lower()
+            local needle = Norm(name)
+            if #needle < 5 then return end -- too short: substring would false-match inside longer words
             for _, lq in ipairs(logQuests) do
                 if lq.hay:find(needle, 1, true) then
                     q = { quest = lq.quest, zone = lq.zone }
