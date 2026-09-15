@@ -4,12 +4,13 @@
 
 local ADDON, ns = ...
 
-ns.version = "1.10.0"
+ns.version = "1.11.0"
 
 local defaults = {
     instantDestroy = false, -- dangerous, ships OFF
     tooltipIDs     = true,  -- cosmetic, replaces standalone IDTip
     questTooltip   = true,  -- quest name/area/progress on quest items
+    hideFriendLogin = true, -- mute friend online/offline system lines
     itemMenu       = true,  -- Alt+Right-click menu on bag items
     sellGreys      = true,  -- pure junk, safe
     sellWhites     = false, -- aggressive: EVERYTHING white, ships OFF
@@ -98,6 +99,10 @@ local function BuildPanel()
           .. "settings.", nil, function()
               if ns.ApplyClassColors then ns.ApplyClassColors() end
           end)
+    Check(1, 0, "hideFriendLogin", "Hide friend login/logout messages",
+          "Mute the 'has come online / gone offline' system lines for "
+          .. "people on your FRIENDS list. Guild members who aren't "
+          .. "friends still show.")
     Check(1, 0, "chatTimestamps", "Chat timestamps",
           "Grey hh:mm before every line in the chat windows (combat log "
           .. "excluded). Applies to new messages instantly.")
